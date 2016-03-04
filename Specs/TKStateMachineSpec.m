@@ -138,6 +138,23 @@ context(@"when initialized", ^{
             TKEvent *fetchedEvent = [stateMachine eventNamed:@"Start Dating"];
             [[fetchedEvent should] equal:event];
         });
+
+        it(@"can contains equel name events", ^{
+            TKState *problemsState = [TKState stateWithName:@"Problems"];
+            [stateMachine addState:problemsState];
+
+            TKEvent *duplicateEvent = [TKEvent eventWithName:@"Start Dating" transitioningFromStates:@[datingState] toState:problemsState];
+            [stateMachine addEvent:duplicateEvent];
+
+            stateMachine.initialState = datingState;
+            [stateMachine activate];
+
+            [[@([stateMachine canFireEvent:@"Start Dating"]) should] beYes];
+
+            [stateMachine fireEvent:@"Start Dating" userInfo:nil error:nil];
+
+            [[stateMachine.currentState should] equal:problemsState];
+        });
     });
 });
 
